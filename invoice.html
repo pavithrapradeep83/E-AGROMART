@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        @media print {
+            .navbar, .invoice-actions, #toast { display: none !important; }
+            .invoice-content { box-shadow: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="invoice-container">
+        <div class="invoice-actions">
+            <a href="buyer.html" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back
+            </a>
+            <button onclick="printInvoice()" class="btn btn-primary">
+                <i class="fas fa-print"></i> Download Invoice
+            </button>
+        </div>
+
+        <div class="invoice-content">
+            <!-- Invoice Header -->
+            <div class="invoice-header">
+                <div class="invoice-logo">
+                    <i class="fas fa-leaf"></i>
+                    <h1>Farmer Market</h1>
+                </div>
+                <div class="invoice-title">
+                    <h2>Invoice</h2>
+                </div>
+                <div class="invoice-meta">
+                    <p><strong>Invoice ID:</strong> <span id="invoiceId">#---</span></p>
+                    <p><strong>Date:</strong> <span id="invoiceDate">---</span></p>
+                </div>
+            </div>
+
+            <!-- Invoice Content -->
+            <div class="invoice-body">
+                <!-- Billing Info -->
+                <div class="billing-section">
+                    <div class="billing-column">
+                        <h3>Bill To</h3>
+                        <p><strong id="buyerName">---</strong></p>
+                        <p id="buyerEmail">---</p>
+                        <p id="buyerAddress">---</p>
+                    </div>
+                    <div class="billing-column">
+                        <h3>Order Details</h3>
+                        <p><strong>Order #:</strong> <span id="orderIdDisplay">---</span></p>
+                        <p><strong>Order Date:</strong> <span id="orderDate">---</span></p>
+                        <p><strong>Payment Status:</strong> <span id="paymentStatus" class="badge">---</span></p>
+                        <p><strong>Order Status:</strong> <span id="orderStatusDisplay" class="badge">---</span></p>
+                    </div>
+                </div>
+
+                <!-- Items Table -->
+                <div class="invoice-items">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Price</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoiceItemsBody">
+                            <!-- Items will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="invoice-totals">
+                    <div class="totals-row">
+                        <span>Subtotal</span>
+                        <span id="invoiceSubtotal">₹0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <span>Discount <span id="discountCodeDisplay"></span></span>
+                        <span id="invoiceDiscount">-₹0.00</span>
+                    </div>
+                    <div class="totals-row final">
+                        <span>Final Amount</span>
+                        <span id="invoiceFinalAmount">₹0.00</span>
+                    </div>
+                </div>
+
+                <!-- Payment Info -->
+                <div class="payment-info">
+                    <h3>Payment Information</h3>
+                    <p><strong>Payment Method:</strong> <span id="paymentMethod">---</span></p>
+                    <p><strong>Payment Status:</strong> <span id="paymentStatusDetail">---</span></p>
+                </div>
+
+                <!-- Footer -->
+                <div class="invoice-footer">
+                    <p>Thank you for shopping with Farmer Market!</p>
+                    <p>For support, contact us at: support@farmermarket.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Core initialization
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Theme toggle setup
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            if (document.getElementById('themeToggle')) {
+                document.getElementById('themeToggle').addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+        });
+
+        function initInvoicePage() {
+            redirectIfNotLoggedIn();
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('orderId');
+
+            if (!orderId) {
+                showToast('Invalid invoice ID', 'error');
+                setTimeout(() => {
+                    window.location.href = 'buyer.html';
+                }, 2000);
+                return;
+            }
+
+            const orders = JSON.parse(sessionStorage.getItem('orders')) || [];
+            const order = orders.find(o => o.id === orderId);
+
+            if (!order) {
+                showToast('Order not found', 'error');
+                setTimeout(() => {
+                    window.location.href = 'buyer.html';
+                }, 2000);
+                return;
+            }
+
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            if (currentUser.id !== order.buyerId) {
+                showToast('Unauthorized access', 'error');
+                setTimeout(() => {
+                    window.location.href = 'buyer.html';
+                }, 2000);
+                return;
+            }
+
+            renderInvoice(order, currentUser);
+        }
+
+        function renderInvoice(order, user) {
+            // Header info
+            document.getElementById('invoiceId').textContent = order.id.substring(0, 12);
+            document.getElementById('invoiceDate').textContent = formatDate(order.createdAt);
+            document.getElementById('orderIdDisplay').textContent = order.id.substring(0, 12);
+            document.getElementById('orderDate').textContent = formatDate(order.createdAt);
+
+            // Buyer info
+            document.getElementById('buyerName').textContent = user.name;
+            document.getElementById('buyerEmail').textContent = user.email;
+
+            const userAddress = user.address ? (user.address.street + ', ' + user.address.city + ', ' + user.address.state) : 'Not provided';
+            document.getElementById('buyerAddress').textContent = userAddress;
+
+            // Status
+            document.getElementById('paymentStatus').textContent = order.paymentStatus;
+            document.getElementById('paymentStatus').className = 'badge status-' + order.paymentStatus.toLowerCase();
+            document.getElementById('orderStatusDisplay').textContent = order.orderStatus;
+            document.getElementById('orderStatusDisplay').className = 'badge status-' + order.orderStatus.toLowerCase().replace(/\s+/g, '-');
+
+            // Items
+            let itemsHtml = '';
+            let subtotal = 0;
+
+            order.products.forEach(product => {
+                const itemTotal = product.price * product.quantity;
+                subtotal += itemTotal;
+
+                itemsHtml += `
+                    <tr>
+                        <td>${product.productName}</td>
+                        <td>${product.quantity}</td>
+                        <td>₹${product.price.toFixed(2)}</td>
+                        <td>₹${itemTotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('invoiceItemsBody').innerHTML = itemsHtml;
+
+            // Totals
+            const discount = order.discountAmount || 0;
+            const finalAmount = order.totalAmount || (subtotal - discount);
+
+            document.getElementById('invoiceSubtotal').textContent = '$' + subtotal.toFixed(2);
+            document.getElementById('invoiceDiscount').textContent = '-$' + discount.toFixed(2);
+            document.getElementById('invoiceFinalAmount').textContent = '$' + finalAmount.toFixed(2);
+
+            if (order.discountCode) {
+                document.getElementById('discountCodeDisplay').textContent = '(' + order.discountCode + ')';
+            }
+
+            // Payment info
+            document.getElementById('paymentMethod').textContent = order.paymentMethod || 'N/A';
+            document.getElementById('paymentStatusDetail').textContent = order.paymentStatus || 'N/A';
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initInvoicePage);
+    </script>
+</body>
+</html>
