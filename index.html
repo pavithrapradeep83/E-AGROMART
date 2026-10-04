@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Connect directly with local farmers. Smart agriculture at your fingertips.">
+    <meta name="theme-color" content="#2e7d32">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Farmer Market - Smart Agriculture Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%232e7d32' width='100' height='100'/><text x='50%' y='50%' font-size='50' fill='white' text-anchor='middle' dominant-baseline='middle' font-family='Arial' font-weight='bold'>FM</text></svg>">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="#home" class="nav-link">Home</a></li>
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="login.html" class="nav-link">Login</a></li>
+                <li><a href="register.html" class="nav-link">Register</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <!-- Animated background shapes -->
+        <div class="hero-bg">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+        </div>
+
+        <div class="hero-content">
+            <h1 class="hero-title">Farmer Market</h1>
+            <p class="hero-subtitle">Connect Directly with Local Farmers. Smart Agriculture at Your Fingertips.</p>
+            <a href="register.html" class="btn btn-primary btn-lg">Start Trading</a>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2 class="section-title">Why Choose Farmer Market?</h2>
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3>Direct Farmer Access</h3>
+                    <p>Buy fresh products straight from the source. Support local farmers and get the freshest produce.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h3>Smart Marketplace</h3>
+                    <p>Easy-to-use shopping cart, quick checkout, and secure transactions at your convenience.</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <h3>Real-time Tracking</h3>
+                    <p>Track your orders in real-time from farmers to your doorstep. Stay informed every step.</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h3>Analytics Dashboard</h3>
+                    <p>Farmers and admins get powerful insights with detailed analytics and performance metrics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agriculture Tips Section -->
+    <section class="agriculture-tips">
+        <div class="container">
+            <h2 class="section-title">Agriculture Tips & Best Practices</h2>
+            <p class="section-subtitle">Learn from industry experts and grow your farming success</p>
+            
+            <div class="tips-grid">
+                <!-- Tip 1 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Organic Farming Benefits</h3>
+                    <p>Discover how organic farming practices improve soil health, increase yields, and create premium produce that commands higher prices in the market.</p>
+                    <ul class="tip-list">
+                        <li>Avoid synthetic pesticides and fertilizers</li>
+                        <li>Implement crop rotation techniques</li>
+                        <li>Use natural compost and manure</li>
+                        <li>Get organic certification</li>
+                    </ul>
+                </div>
+
+                <!-- Tip 2 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <h3>Smart Water Management</h3>
+                    <p>Efficient water usage is crucial for sustainable farming. Learn techniques to conserve water while maintaining crop productivity.</p>
+                    <ul class="tip-list">
+                        <li>Install drip irrigation systems</li>
+                        <li>Monitor soil moisture levels</li>
+                        <li>Schedule watering during cooler hours</li>
+                        <li>Use mulching to retain moisture</li>
+                    </ul>
+                </div>
+
+                <!-- Tip 3 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>Seasonal Crop Planning</h3>
+                    <p>Plan your crops according to seasons to maximize production and profit. Know which crops perform best in different weather conditions.</p>
+                    <ul class="tip-list">
+                        <li>Spring: Plant leafy greens and vegetables</li>
+                        <li>Summer: Grow high-demand fruits</li>
+                        <li>Fall: Plant root vegetables and grains</li>
+                        <li>Winter: Focus on protected crops</li>
+                    </ul>
+                </div>
+
+                <!-- Tip 4 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3>Pest & Disease Control</h3>
+                    <p>Protect your crops naturally with integrated pest management techniques that are safe for the environment and your produce.</p>
+                    <ul class="tip-list">
+                        <li>Use beneficial insects and nematodes</li>
+                        <li>Apply natural pesticides (neem oil)</li>
+                        <li>Maintain field hygiene</li>
+                        <li>Scout regularly for early detection</li>
+                    </ul>
+                </div>
+
+                <!-- Tip 5 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3>Soil Health & Nutrition</h3>
+                    <p>Healthy soil is the foundation of successful farming. Understand nutrient management and soil testing for optimal crop growth.</p>
+                    <ul class="tip-list">
+                        <li>Conduct annual soil tests</li>
+                        <li>Balance pH levels appropriately</li>
+                        <li>Add organic matter regularly</li>
+                        <li>Use cover crops for nitrogen fixing</li>
+                    </ul>
+                </div>
+
+                <!-- Tip 6 -->
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Marketing & Pricing</h3>
+                    <p>Successfully market your produce and price it competitively. Build strong customer relationships and increase your farm's profitability.</p>
+                    <ul class="tip-list">
+                        <li>Understand market demand trends</li>
+                        <li>Build direct customer relationships</li>
+                        <li>Use digital marketing effectively</li>
+                        <li>Offer quality certifications</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Agriculture Tips Section -->
+    <section class="tips-section" id="tips">
+        <div class="container">
+            <div class="section-header">
+                <h2>Agriculture Tips & Guides</h2>
+                <p>Learn best practices from our farming experts</p>
+            </div>
+
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <h3>Organic Farming</h3>
+                    <p>Grow healthy crops without synthetic pesticides. Use natural compost, crop rotation, and companion planting to maintain soil fertility and protect the environment.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-water"></i>
+                    </div>
+                    <h3>Water Management</h3>
+                    <p>Optimize irrigation techniques to save water and increase yields. Drip irrigation, mulching, and soil moisture monitoring can reduce water usage by 40-50%.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-sun"></i>
+                    </div>
+                    <h3>Seasonal Crops</h3>
+                    <p>Plant crops aligned with seasonal patterns for maximum productivity. Spring vegetables, monsoon crops, and winter fruits - know what grows best when.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                    <h3>Pest Management</h3>
+                    <p>Control pests naturally without chemicals. Use beneficial insects, neem oil, and proper field sanitation to protect your crops sustainably.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h3>Soil Health</h3>
+                    <p>Build rich, fertile soil with organic matter. Regular soil testing, composting, and cover crops ensure long-term agricultural productivity and sustainability.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+
+                <div class="tip-card">
+                    <div class="tip-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Market Strategy</h3>
+                    <p>Maximize profits by understanding market trends. Use data-driven decisions to choose profitable crops, negotiate better prices, and reach more customers.</p>
+                    <a href="#" class="tip-link">Learn More <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Agriculture Business?</h2>
+            <p>Join thousands of farmers and buyers already using Farmer Market.</p>
+            <div class="cta-buttons">
+                <a href="register.html?role=buyer" class="btn btn-primary">I'm a Buyer</a>
+                <a href="register.html?role=farmer" class="btn btn-secondary">I'm a Farmer</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>Farmer Market</h4>
+                    <p>Empowering farmers and connecting communities through smart agriculture.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-icon"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Farmer Market. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Load theme
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        loadTheme();
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').then(registration => {
+                    console.log('Service Worker registered:', registration);
+                }).catch(error => {
+                    console.log('Service Worker registration failed:', error);
+                });
+            });
+        }
+
+        // Install prompt handling
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Show install button when PWA is ready (optional)
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA installed successfully');
+            showToast('App installed! You can use it offline now.', 'success');
+        });
+    </script>
+</body>
+</html>
