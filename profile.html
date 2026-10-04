@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <a href="javascript:history.back()" class="btn btn-secondary btn-sm">← Back</a>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="profile-container">
+        <div class="container">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <h1>My Profile</h1>
+            </div>
+
+            <div class="profile-content">
+                <!-- Profile Tabs -->
+                <div class="profile-tabs">
+                    <button class="profile-tab-btn active" data-tab="personal">
+                        <i class="fas fa-user"></i> Personal Info
+                    </button>
+                    <button class="profile-tab-btn" data-tab="address">
+                        <i class="fas fa-map-marker-alt"></i> Address
+                    </button>
+                    <button class="profile-tab-btn" data-tab="password">
+                        <i class="fas fa-lock"></i> Password
+                    </button>
+                    <button class="profile-tab-btn" data-tab="orders">
+                        <i class="fas fa-receipt"></i> Order History
+                    </button>
+                </div>
+
+                <!-- Tab Contents -->
+                <div class="profile-tab-content">
+                    <!-- Personal Info Tab -->
+                    <div id="personal-tab" class="tab-pane active">
+                        <div class="card">
+                            <div class="form-section">
+                                <h2>Personal Information</h2>
+
+                                <div class="profile-picture-section">
+                                    <div class="profile-picture">
+                                        <img id="profileImg" src="https://via.placeholder.com/120" alt="Profile Picture">
+                                    </div>
+                                    <div class="picture-actions">
+                                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('profileImageInput').click()">
+                                            <i class="fas fa-camera"></i> Change Photo
+                                        </button>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="removeProfilePicture()">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <form id="personalInfoForm" class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label for="fullName">Full Name</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-user"></i>
+                                            <input type="text" id="fullName" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="email">Email Address</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-envelope"></i>
+                                            <input type="email" id="email" readonly>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="phone">Phone Number</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-phone"></i>
+                                            <input type="tel" id="phone" placeholder="(123) 456-7890">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="userRole">Account Type</label>
+                                        <select id="userRole" disabled>
+                                            <option value="buyer">Buyer</option>
+                                            <option value="farmer">Farmer</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group full-width" style="margin-top: 20px;">
+                                        <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    </div>
+                                    <small id="personalError" class="error-message" style="display: block;"></small>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Address Tab -->
+                    <div id="address-tab" class="tab-pane">
+                        <div class="card">
+                            <div class="form-section">
+                                <h2>Delivery Address</h2>
+
+                                <form id="addressForm" class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label for="street">Street Address</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-road"></i>
+                                            <input type="text" id="street" placeholder="123 Main Street">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="city">City</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-building"></i>
+                                            <input type="text" id="city">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="state">State</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-flag"></i>
+                                            <input type="text" id="state">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="pincode">Pincode</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-mailbox"></i>
+                                            <input type="text" id="pincode" placeholder="12345">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width" style="margin-top: 20px;">
+                                        <button type="submit" class="btn btn-primary">Save Address</button>
+                                    </div>
+                                    <small id="addressError" class="error-message" style="display: block;"></small>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password Tab -->
+                    <div id="password-tab" class="tab-pane">
+                        <div class="card">
+                            <div class="form-section">
+                                <h2>Change Password</h2>
+
+                                <form id="passwordForm" class="form-grid">
+                                    <div class="form-group full-width">
+                                        <label for="currentPassword">Current Password</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-lock"></i>
+                                            <input type="password" id="currentPassword" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="newPassword">New Password</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-lock"></i>
+                                            <input type="password" id="newPassword" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width">
+                                        <label for="confirmNewPassword">Confirm New Password</label>
+                                        <div class="input-group">
+                                            <i class="fas fa-lock"></i>
+                                            <input type="password" id="confirmNewPassword" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group full-width" style="margin-top: 20px;">
+                                        <button type="submit" class="btn btn-primary">Update Password</button>
+                                    </div>
+                                    <small id="passwordError" class="error-message" style="display: block;"></small>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Order History Tab -->
+                    <div id="orders-tab" class="tab-pane">
+                        <div class="card">
+                            <h2>Order History</h2>
+                            <div id="orderHistoryList" class="orders-list">
+                                <!-- Orders will be rendered here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Core initialization
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Theme toggle setup
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            if (document.getElementById('themeToggle')) {
+                document.getElementById('themeToggle').addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+        });
+
+        async function initProfilePage() {
+            redirectIfNotLoggedIn();
+
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser) {
+                await loadProfileData(currentUser);
+                setupProfileTabs();
+                setupProfileForms(currentUser);
+            }
+        }
+
+        async function loadProfileData(user) {
+            document.getElementById('fullName').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('userRole').value = user.role;
+
+            if (user.profileImage) {
+                document.getElementById('profileImg').src = user.profileImage;
+            }
+
+            // Load address if exists
+            if (user.address) {
+                document.getElementById('street').value = user.address.street || '';
+                document.getElementById('city').value = user.address.city || '';
+                document.getElementById('state').value = user.address.state || '';
+                document.getElementById('pincode').value = user.address.pincode || '';
+            }
+
+            // Load order history if buyer
+            if (user.role === 'buyer') {
+                await loadOrderHistory(user.id);
+            }
+        }
+
+        function setupProfileTabs() {
+            const tabButtons = document.querySelectorAll('.profile-tab-btn');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                    this.classList.add('active');
+                    document.getElementById(tabName + '-tab').classList.add('active');
+                });
+            });
+        }
+
+        function setupProfileForms(user) {
+            // Personal info form
+            document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updatePersonalInfo(user.id);
+            });
+
+            // Address form
+            document.getElementById('addressForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateAddress(user.id);
+            });
+
+            // Password form
+            document.getElementById('passwordForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updatePassword(user.id);
+            });
+
+            // Profile image upload
+            document.getElementById('profileImageInput').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(event) {
+                        document.getElementById('profileImg').src = event.target.result;
+                        updateProfileImage(user.id, event.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        async function updatePersonalInfo(userId) {
+            const name = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+
+            if (!name) {
+                document.getElementById('personalError').textContent = 'Name is required';
+                return;
+            }
+
+            try {
+                const updatedUser = await updateUserProfile({
+                    name,
+                    phone
+                });
+
+                if (updatedUser) {
+                    document.getElementById('personalError').textContent = '';
+                    showToast('Personal information updated successfully!', 'success');
+                } else {
+                    document.getElementById('personalError').textContent = 'Failed to update personal information';
+                }
+            } catch (error) {
+                console.error('Error updating personal info:', error);
+                document.getElementById('personalError').textContent = 'Error updating personal information';
+            }
+        }
+
+        async function updateAddress(userId) {
+            const street = document.getElementById('street').value;
+            const city = document.getElementById('city').value;
+            const state = document.getElementById('state').value;
+            const pincode = document.getElementById('pincode').value;
+
+            try {
+                const address = {
+                    street,
+                    city,
+                    state,
+                    pincode
+                };
+
+                const updatedUser = await updateUserProfile({
+                    address
+                });
+
+                if (updatedUser) {
+                    document.getElementById('addressError').textContent = '';
+                    showToast('Address updated successfully!', 'success');
+                } else {
+                    document.getElementById('addressError').textContent = 'Failed to update address';
+                }
+            } catch (error) {
+                console.error('Error updating address:', error);
+                document.getElementById('addressError').textContent = 'Error updating address';
+            }
+        }
+
+        async function updatePassword(userId) {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+            if (!currentPassword || !newPassword) {
+                document.getElementById('passwordError').textContent = 'All password fields are required';
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                document.getElementById('passwordError').textContent = 'New password must be at least 6 characters';
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById('passwordError').textContent = 'Passwords do not match';
+                return;
+            }
+
+            try {
+                // Note: Backend expects new password only - currentPassword validation might need to be handled separately
+                const updatedUser = await updateUserProfile({
+                    password: newPassword
+                });
+
+                if (updatedUser) {
+                    document.getElementById('passwordError').textContent = '';
+                    document.getElementById('passwordForm').reset();
+                    showToast('Password updated successfully!', 'success');
+                } else {
+                    document.getElementById('passwordError').textContent = 'Failed to update password';
+                }
+            } catch (error) {
+                console.error('Error updating password:', error);
+                document.getElementById('passwordError').textContent = 'Error updating password: ' + (error.message || '');
+            }
+        }
+
+        function updateProfileImage(userId, imageData) {
+            // Profile image update - stored in sessionStorage for current session
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || {};
+            currentUser.profileImage = imageData;
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            showToast('Profile picture updated!', 'success');
+        }
+
+        function removeProfilePicture() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser')) || {};
+            currentUser.profileImage = '';
+            sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+            document.getElementById('profileImg').src = 'https://via.placeholder.com/120';
+            showToast('Profile picture removed', 'success');
+        }
+
+        async function loadOrderHistory(userId) {
+            try {
+                const orders = await getOrders();
+                
+                const listContainer = document.getElementById('orderHistoryList');
+
+                if (!orders || orders.length === 0) {
+                    listContainer.innerHTML = '<p class="empty-message">No orders yet</p>';
+                    return;
+                }
+
+                listContainer.innerHTML = orders.reverse().map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <h4>Order #${order.id.substring(0, 8)}</h4>
+                            <span class="status-badge status-${order.status.toLowerCase()}">${order.status}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Date:</strong> ${formatDate(order.created_at)}</p>
+                            <p><strong>Amount:</strong> $${(order.total || 0).toFixed(2)}</p>
+                            <p><strong>Status:</strong> ${order.status}</p>
+                        </div>
+                        <a href="invoice.html?orderId=${order.id}" class="btn btn-sm btn-primary">View Invoice</a>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading order history:', error);
+                const listContainer = document.getElementById('orderHistoryList');
+                listContainer.innerHTML = '<p class="empty-message">Error loading orders</p>';
+            }
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initProfilePage);
+    </script>
+</body>
+</html>
