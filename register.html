@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <a href="index.html" class="btn btn-secondary btn-sm">← Back</a>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <div class="auth-bg">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+        </div>
+
+        <div class="auth-card fade-in">
+            <div class="auth-header">
+                <h1>Create Account</h1>
+                <p>Join the Farmer Market community</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <!-- Name -->
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="name" name="name" placeholder="John Doe" required>
+                    </div>
+                    <small id="nameError" class="error-message"></small>
+                </div>
+
+                <!-- Email -->
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="email" name="email" placeholder="your@email.com" required>
+                    </div>
+                    <small id="emailError" class="error-message"></small>
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" name="password" placeholder="••••••" required autocomplete="new-password">
+                    </div>
+                    <small id="passwordError" class="error-message"></small>
+                </div>
+
+                <!-- Confirm Password -->
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••" required autocomplete="new-password">
+                    </div>
+                    <small id="confirmError" class="error-message"></small>
+                </div>
+
+                <!-- Role -->
+                <div class="form-group">
+                    <label for="role">Select Role</label>
+                    <select id="role" name="role" required>
+                        <option value="">Choose your role</option>
+                        <option value="buyer">Buyer</option>
+                        <option value="farmer">Farmer</option>
+                    </select>
+                    <small id="roleError" class="error-message"></small>
+                </div>
+
+                <!-- Terms & Conditions -->
+                <div class="form-check">
+                    <input type="checkbox" id="terms" name="terms" required>
+                    <label for="terms">I agree to the <a href="#">Terms & Conditions</a></label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Create Account</span>
+                </button>
+
+                <!-- General Error -->
+                <small id="generalError" class="error-message" style="display: block; text-align: center; margin-top: 10px;"></small>
+            </form>
+
+            <!-- Sign In Link -->
+            <div class="auth-footer">
+                <p>Already have an account? <a href="login.html">Sign in here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js?v=20260317-001"></script>
+    <script>
+        // Load theme
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        loadTheme();
+
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Set role from URL parameter if exists
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role');
+        if (role) {
+            document.getElementById('role').value = role;
+        }
+
+        // Register form handler
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const role = document.getElementById('role').value;
+            const submitBtn = this.querySelector('button[type="submit"]');
+
+            // Clear errors
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            document.getElementById('confirmError').textContent = '';
+            document.getElementById('roleError').textContent = '';
+            document.getElementById('generalError').textContent = '';
+
+            // Validation
+            let isValid = true;
+
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Name is required';
+                isValid = false;
+            }
+            if (!name || name.length < 2) {
+                document.getElementById('nameError').textContent = 'Name must be at least 2 characters';
+                isValid = false;
+            }
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email is required';
+                isValid = false;
+            }
+            if (!password) {
+                document.getElementById('passwordError').textContent = 'Password is required';
+                isValid = false;
+            } else if (password.length < 6) {
+                document.getElementById('passwordError').textContent = 'Password must be at least 6 characters';
+                isValid = false;
+            }
+            if (password !== confirmPassword) {
+                document.getElementById('confirmError').textContent = 'Passwords do not match';
+                isValid = false;
+            }
+            if (!role) {
+                document.getElementById('roleError').textContent = 'Please select a role';
+                isValid = false;
+            }
+
+            if (!isValid) return;
+
+            // Disable button during submission
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span>Creating account...</span>';
+
+            try {
+                // Call register function
+                const result = await registerUser(name, email, password, role);
+                
+                console.log('📊 registerUser returned:', result);
+                
+                if (!result) {
+                    console.error('❌ registerUser returned undefined!');
+                    document.getElementById('generalError').textContent = 'No response from server';
+                    showToast('No response from registration service', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Create Account</span>';
+                    return;
+                }
+                
+                if (result.success) {
+                    console.log('✅ Registration successful');
+                    showToast('Registration successful! Redirecting to login...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    console.warn('⚠️ Registration failed:', result.message);
+                    document.getElementById('generalError').textContent = result.message || 'Registration failed';
+                    showToast(result.message || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                console.error('❌ REGISTRATION ERROR (form handler):');
+                console.error('   Message:', error.message);
+                console.error('   Stack:', error.stack);
+                console.error('   Full Error:', error);
+                document.getElementById('generalError').textContent = 'An error occurred. Please try again.';
+                showToast(`Network error: ${error.message || 'Please check backend connection'}`, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<span>Create Account</span>';
+            }
+        });
+    </script>
+</body>
+</html>
