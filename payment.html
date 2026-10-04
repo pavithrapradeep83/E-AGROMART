@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Payment - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="payment-container">
+        <!-- Left Side: Order Summary -->
+        <div class="payment-summary">
+            <div class="summary-header">
+                <h2>Order Summary</h2>
+            </div>
+
+            <div id="orderItemsList" class="order-items-list">
+                <!-- Items will be rendered here -->
+            </div>
+
+            <div class="summary-details">
+                <div class="detail-row">
+                    <span>Subtotal</span>
+                    <span id="summarySubtotal">₹0.00</span>
+                </div>
+                <div class="detail-row">
+                    <span>Discount</span>
+                    <span id="summaryDiscount">-₹0.00</span>
+                </div>
+                <div class="detail-row total">
+                    <span>Total Amount</span>
+                    <span id="summaryTotal">₹0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Payment Form -->
+        <div class="payment-form-section">
+            <div class="payment-header">
+                <h1>Secure Payment</h1>
+                <p>Complete your payment safely</p>
+            </div>
+
+            <!-- Payment Method Tabs -->
+            <div class="payment-tabs">
+                <button class="tab-button active" data-method="card">
+                    <i class="fas fa-credit-card"></i> Card
+                </button>
+                <button class="tab-button" data-method="upi">
+                    <i class="fas fa-mobile-alt"></i> UPI
+                </button>
+                <button class="tab-button" data-method="netbanking">
+                    <i class="fas fa-university"></i> Net Banking
+                </button>
+                <button class="tab-button" data-method="cod">
+                    <i class="fas fa-money-bill"></i> COD
+                </button>
+            </div>
+
+            <!-- Card Payment Form -->
+            <form id="cardPaymentForm" class="payment-form active">
+                <div class="form-group">
+                    <label for="cardNumber">Card Number</label>
+                    <div class="input-group">
+                        <i class="fas fa-credit-card"></i>
+                        <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardHolder">Card Holder Name</label>
+                        <div class="input-group">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="cardHolder" placeholder="John Doe" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="cardExpiry">Expiry Date</label>
+                        <div class="input-group">
+                            <i class="fas fa-calendar"></i>
+                            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cardCVV">CVV</label>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="text" id="cardCVV" placeholder="123" maxlength="4" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Card Type</label>
+                        <select id="cardType" class="card-type-select">
+                            <option value="">Detect automatically</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="amex">American Express</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-check">
+                    <input type="checkbox" id="saveCard" name="saveCard">
+                    <label for="saveCard">Save this card for future transactions</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg payment-submit">
+                    <span>Pay</span> <span id="payAmount">₹0.00</span>
+                </button>
+            </form>
+
+            <!-- UPI Payment Form -->
+            <form id="upiPaymentForm" class="payment-form" style="display: none;">
+                <div class="form-group">
+                    <label for="upiId">UPI ID</label>
+                    <div class="input-group">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input type="text" id="upiId" placeholder="yourname@upi" required>
+                    </div>
+                </div>
+
+                <div class="upi-info">
+                    <p>You'll be redirected to your UPI app to complete the payment</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg payment-submit">
+                    <span>Continue with UPI</span>
+                </button>
+            </form>
+
+            <!-- Net Banking Form -->
+            <form id="netbankingPaymentForm" class="payment-form" style="display: none;">
+                <div class="form-group">
+                    <label for="bankSelect">Select Your Bank</label>
+                    <select id="bankSelect" required>
+                        <option value="">Choose your bank</option>
+                        <option value="hdfc">HDFC Bank</option>
+                        <option value="icici">ICICI Bank</option>
+                        <option value="sbi">State Bank of India</option>
+                        <option value="axis">Axis Bank</option>
+                        <option value="kotak">Kotak Bank</option>
+                        <option value="bob">Bank of Baroda</option>
+                    </select>
+                </div>
+
+                <div class="netbanking-info">
+                    <p>You'll be redirected to your bank's secure login page</p>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg payment-submit">
+                    <span>Continue with Net Banking</span>
+                </button>
+            </form>
+
+            <!-- Cash on Delivery Form -->
+            <form id="codPaymentForm" class="payment-form" style="display: none;">
+                <div class="cod-info">
+                    <div class="cod-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <h3>Pay on Delivery</h3>
+                    <p>Pay the amount when your order is delivered</p>
+                    <div class="cod-details">
+                        <p><strong>Amount:</strong> <span id="codAmount">₹0.00</span></p>
+                        <p>Our delivery partner will collect the payment at your doorstep</p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block btn-lg payment-submit">
+                    <span>Confirm Order</span>
+                </button>
+            </form>
+
+            <!-- Security Badge -->
+            <div class="security-badge">
+                <i class="fas fa-lock"></i>
+                <span>Secure & Encrypted Payment</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Processing Modal -->
+    <div id="paymentProcessingModal" class="modal">
+        <div class="modal-content payment-modal">
+            <div class="processing-spinner"></div>
+            <h2>Processing Payment</h2>
+            <p>Please wait while we process your payment...</p>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="paymentSuccessModal" class="modal">
+        <div class="modal-content payment-modal">
+            <div class="success-animation">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Payment Successful!</h2>
+            <p id="successMessage">Your payment has been processed successfully</p>
+            <div class="success-details">
+                <p><strong>Order ID:</strong> <span id="successOrderId">-</span></p>
+                <p><strong>Amount:</strong> <span id="successAmount">₹0.00</span></p>
+            </div>
+            <button class="btn btn-primary btn-block" onclick="goToDashboard()">
+                View Order Details
+            </button>
+        </div>
+    </div>
+
+    <!-- Payment Failed Modal -->
+    <div id="paymentFailedModal" class="modal">
+        <div class="modal-content payment-modal">
+            <div class="failed-animation">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <h2>Payment Failed</h2>
+            <p id="failureMessage">Something went wrong with your payment</p>
+            <button class="btn btn-secondary btn-block" onclick="closeModal('paymentFailedModal')">
+                Try Again
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        // Core initialization
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        // Theme toggle setup
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTheme();
+            if (document.getElementById('themeToggle')) {
+                document.getElementById('themeToggle').addEventListener('click', function() {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+                });
+            }
+        });
+
+        // Initialize payment page
+        async function initPaymentPage() {
+            redirectIfNotLoggedIn();
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            const discountInfo = JSON.parse(sessionStorage.getItem('discountInfo')) || { code: '', amount: 0 };
+
+            if (cart.length === 0) {
+                window.location.href = 'buyer.html';
+                return;
+            }
+
+            await renderOrderItems(cart, discountInfo);
+            setupPaymentTabs();
+            setupCardNumberFormatting();
+            setupExpiryFormatting();
+        }
+
+        async function renderOrderItems(cart, discountInfo) {
+            try {
+                const allProducts = await getProducts();
+                let subtotal = 0;
+
+                const itemsHtml = cart.map(item => {
+                    const product = allProducts.find(p => p.id === item.productId);
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+
+                    return `
+                        <div class="order-item">
+                            <div class="item-image">
+                                <img src="${product ? product.image : 'https://via.placeholder.com/60x60'}" alt="${item.productName}">
+                            </div>
+                            <div class="item-details">
+                                <h4>${item.productName}</h4>
+                                <p>${item.quantity}x</p>
+                            </div>
+                            <div class="item-price">
+                                $${itemTotal.toFixed(2)}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('orderItemsList').innerHTML = itemsHtml;
+
+                const discount = discountInfo.amount || 0;
+                const finalAmount = subtotal - discount;
+
+                document.getElementById('summarySubtotal').textContent = '₹' + subtotal.toFixed(2);
+                document.getElementById('summaryDiscount').textContent = '₹' + discount.toFixed(2);
+                document.getElementById('summaryTotal').textContent = '₹' + finalAmount.toFixed(2);
+                document.getElementById('payAmount').textContent = '₹' + finalAmount.toFixed(2);
+                document.getElementById('codAmount').textContent = '₹' + finalAmount.toFixed(2);
+
+                window.paymentAmount = finalAmount;
+            } catch (error) {
+                console.error('Error rendering order items:', error);
+                showToast('Failed to load order details', 'error');
+            }
+        }
+
+        function setupPaymentTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const paymentForms = document.querySelectorAll('.payment-form');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const method = this.getAttribute('data-method');
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    paymentForms.forEach(form => form.classList.remove('active'));
+                    form.style.display = 'none';
+
+                    this.classList.add('active');
+                    document.getElementById(method + 'PaymentForm').classList.add('active');
+                    document.getElementById(method + 'PaymentForm').style.display = 'block';
+                });
+            });
+        }
+
+        function setupCardNumberFormatting() {
+            const cardInput = document.getElementById('cardNumber');
+            cardInput.addEventListener('input', function() {
+                let value = this.value.replace(/\s/g, '');
+                let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+                this.value = formatted;
+            });
+        }
+
+        function setupExpiryFormatting() {
+            const expiryInput = document.getElementById('cardExpiry');
+            expiryInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+                }
+                this.value = value;
+            });
+        }
+
+        // Payment form submissions
+        document.getElementById('cardPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processCardPayment();
+        });
+
+        document.getElementById('upiPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processUpiPayment();
+        });
+
+        document.getElementById('netbankingPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processNetBankingPayment();
+        });
+
+        document.getElementById('codPaymentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            processCODPayment();
+        });
+
+        function processCardPayment() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardHolder = document.getElementById('cardHolder').value;
+            const expiry = document.getElementById('cardExpiry').value;
+            const cvv = document.getElementById('cardCVV').value;
+
+            if (!cardNumber || !cardHolder || !expiry || !cvv) {
+                showToast('Please fill in all card details', 'error');
+                return;
+            }
+
+            if (cardNumber.length !== 16) {
+                showToast('Card number must be 16 digits', 'error');
+                return;
+            }
+
+            if (cvv.length < 3) {
+                showToast('CVV must be at least 3 digits', 'error');
+                return;
+            }
+
+            simulatePayment('card', {
+                cardNumber: cardNumber.slice(-4).padStart(16, '*'),
+                cardHolder,
+                method: 'Credit/Debit Card'
+            });
+        }
+
+        function processUpiPayment() {
+            const upiId = document.getElementById('upiId').value;
+
+            if (!upiId || !upiId.includes('@')) {
+                showToast('Please enter a valid UPI ID', 'error');
+                return;
+            }
+
+            simulatePayment('upi', {
+                upiId,
+                method: 'UPI'
+            });
+        }
+
+        function processNetBankingPayment() {
+            const bank = document.getElementById('bankSelect').value;
+
+            if (!bank) {
+                showToast('Please select a bank', 'error');
+                return;
+            }
+
+            simulatePayment('netbanking', {
+                bank,
+                method: 'Net Banking'
+            });
+        }
+
+        function processCODPayment() {
+            simulatePayment('cod', {
+                method: 'Cash on Delivery'
+            });
+        }
+
+        function simulatePayment(method, details) {
+            openModal('paymentProcessingModal');
+
+            // Simulate payment processing (2-4 seconds)
+            const processingTime = 2000 + Math.random() * 2000;
+
+            // 90% success rate (10% failure)
+            const isSuccess = Math.random() > 0.1;
+
+            setTimeout(() => {
+                closeModal('paymentProcessingModal');
+
+                if (isSuccess) {
+                    completePayment(method, details);
+                } else {
+                    showPaymentFailure();
+                }
+            }, processingTime);
+        }
+
+        function completePayment(method, details) {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+
+            // Call backend API to create order
+            const orderProducts = cart.map(item => ({
+                product_id: parseInt(item.productId),
+                quantity: parseInt(item.quantity)
+            }));
+
+            createOrder({
+                products: orderProducts,
+                paymentMethod: details.method || 'credit_card'
+            }).then(response => {
+                // Clear cart
+                sessionStorage.removeItem('cart');
+                sessionStorage.removeItem('cart');
+                
+                // Show success
+                document.getElementById('successOrderId').textContent = response.data?.id || 'Unknown';
+                document.getElementById('successAmount').textContent = '₹' + (response.data?.total || 0).toFixed(2);
+                openModal('paymentSuccessModal');
+                showToast('Order placed successfully!', 'success');
+            }).catch(error => {
+                console.error('Order creation failed:', error);
+                showPaymentFailure();
+                showToast('Failed to create order: ' + error.message, 'error');
+            });
+        }
+
+        function showPaymentFailure() {
+            openModal('paymentFailedModal');
+        }
+
+        function goToDashboard() {
+            const currentUser = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (currentUser && currentUser.role === 'buyer') {
+                window.location.href = 'buyer.html?section=orders';
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        function createNotification(userId, message) {
+            const notifications = JSON.parse(sessionStorage.getItem('notifications')) || [];
+            notifications.push({
+                id: 'notif_' + Date.now(),
+                userId,
+                message,
+                read: false,
+                createdAt: new Date().toISOString()
+            });
+            sessionStorage.setItem('notifications', JSON.stringify(notifications));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', initPaymentPage);
+    </script>
+</body>
+</html>
