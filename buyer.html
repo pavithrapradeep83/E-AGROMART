@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Dashboard - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="javascript:void(0)" onclick="logout()" class="nav-link">Logout</a></li>
+                <li><a href="javascript:void(0)" onclick="toggleCart()" class="nav-link cart-icon">
+                    <i class="fas fa-shopping-cart"></i> <span id="cartCount" class="cart-count">0</span>
+                </a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </navbar>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Menu</h3>
+                <button class="close-sidebar" id="closeSidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="javascript:void(0)" class="menu-item active" onclick="showSection('browse')">
+                    <i class="fas fa-store"></i> Browse Products
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="showSection('orders')">
+                    <i class="fas fa-receipt"></i> My Orders
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Browse Products Section -->
+            <section id="browse-section" class="dashboard-section" style="display: block;">
+                <div class="section-header">
+                    <h1>Browse Products</h1>
+                    <p>Find fresh products from local farmers</p>
+                </div>
+
+                <div class="filters-section">
+                    <!-- Search Bar -->
+                    <div class="search-bar-wrapper">
+                        <div class="search-bar">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search for products, farmers..." onkeyup="filterProducts()">
+                            <button class="search-clear" onclick="clearSearch()" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div class="filters-row">
+                        <div class="filter-item">
+                            <label for="categoryFilter">Category</label>
+                            <select id="categoryFilter" onchange="filterProducts()" class="category-select">
+                                <option value="">All Categories</option>
+                                <option value="vegetables">🥬 Vegetables</option>
+                                <option value="fruits">🍎 Fruits</option>
+                                <option value="grains">🌾 Grains</option>
+                                <option value="dairy">🥛 Dairy</option>
+                                <option value="poultry">🍗 Poultry</option>
+                                <option value="organic">🌱 Organic</option>
+                            </select>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="filter-item">
+                            <label for="priceMin">Min Price</label>
+                            <div class="price-input-group">
+                                <span>$</span>
+                                <input type="number" id="priceMin" placeholder="0" onchange="filterProducts()" min="0">
+                            </div>
+                        </div>
+
+                        <div class="filter-item">
+                            <label for="priceMax">Max Price</label>
+                            <div class="price-input-group">
+                                <span>$</span>
+                                <input type="number" id="priceMax" placeholder="1000" onchange="filterProducts()" min="0">
+                            </div>
+                        </div>
+
+                        <!-- Sort By -->
+                        <div class="filter-item">
+                            <label for="sortBy">Sort By</label>
+                            <select id="sortBy" onchange="filterProducts()" class="category-select">
+                                <option value="">Default</option>
+                                <option value="price-low">💰 Price: Low to High</option>
+                                <option value="price-high">💲 Price: High to Low</option>
+                                <option value="rating">⭐ Top Rated</option>
+                                <option value="newest">✨ Newest First</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-secondary btn-sm" onclick="resetFilters()" style="align-self: flex-end; margin-top: auto; height: fit-content;">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="productsGrid" class="products-grid">
+                    <!-- Products will be rendered here -->
+                </div>
+            </section>
+
+            <!-- My Orders Section -->
+            <section id="orders-section" class="dashboard-section" style="display: none;">
+                <div class="section-header">
+                    <h1>My Orders</h1>
+                </div>
+
+                <div id="ordersList" class="orders-list">
+                    <!-- Orders will be rendered here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h2>Shopping Cart</h2>
+                <button class="modal-close" onclick="toggleCart()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div id="cartItems" class="cart-items">
+                <!-- Cart items will be rendered here -->
+            </div>
+
+            <!-- Coupon Section -->
+            <div class="coupon-section">
+                <div class="coupon-input-group">
+                    <input type="text" id="couponInput" placeholder="Enter coupon code (e.g., FARM10)">
+                    <button class="btn btn-secondary" onclick="applyCouponToCart()">Apply</button>
+                    <button class="btn btn-outline" onclick="removeCoupon()" id="removeCouponBtn" style="display: none;">Remove</button>
+                </div>
+                <div id="appliedCoupon" style="display: none; margin-top: 10px; padding: 10px; background: #e8f5e9; border-radius: 8px; color: #2e7d32;">
+                    <i class="fas fa-check-circle"></i> <span id="couponMessage"></span>
+                </div>
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">₹0.00</span>
+                </div>
+                <div class="summary-row" id="discountRow" style="display: none; color: #4caf50;">
+                    <span>Discount:</span>
+                    <span id="discountAmount">-₹0.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span id="total">₹0.00</span>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="toggleCart()">Continue Shopping</button>
+                <button type="button" class="btn btn-primary" onclick="proceedToPayment()">Proceed to Payment</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Details Modal with Reviews -->
+    <div id="productDetailsModal" class="modal">
+        <div class="modal-content modal-xl">
+            <div class="modal-header">
+                <h2 id="detailProductName">Product Details</h2>
+                <button class="modal-close" onclick="closeModal('productDetailsModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="product-details-container">
+                <!-- Product Image & Info -->
+                <div class="product-details-main">
+                    <div class="product-image-large">
+                        <img id="detailProductImage" src="" alt="Product" style="width: 100%; border-radius: 8px;">
+                        <span id="detailProductCategory" class="category-badge-large"></span>
+                    </div>
+                    <div class="product-info-large">
+                        <h2 id="detailProductNameLarge"></h2>
+                        <p id="detailProductFarmer" class="farmer-info"></p>
+                        <div class="product-rating">
+                            <span id="detailProductRating" class="stars"></span>
+                            <span id="detailReviewCount" class="review-count"></span>
+                        </div>
+                        <p id="detailProductDescription" class="description-large"></p>
+                        <div class="product-price-large" id="detailProductPrice"></div>
+                        <button class="btn btn-primary btn-lg" onclick="addToCartFromDetail()">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3>Customer Reviews</h3>
+                    
+                    <!-- Add Review Form -->
+                    <div class="add-review-form">
+                        <h4>Share Your Experience</h4>
+                        <div class="review-rating">
+                            <label>Rating:</label>
+                            <div class="star-rating">
+                                <span class="star" onclick="setReviewRating(1)">★</span>
+                                <span class="star" onclick="setReviewRating(2)">★</span>
+                                <span class="star" onclick="setReviewRating(3)">★</span>
+                                <span class="star" onclick="setReviewRating(4)">★</span>
+                                <span class="star" onclick="setReviewRating(5)">★</span>
+                            </div>
+                            <span id="ratingValue">0 stars</span>
+                        </div>
+                        <textarea id="reviewComment" placeholder="Write your review here... (optional)" rows="4" maxlength="500"></textarea>
+                        <div class="review-chars-count">
+                            <span id="charCount">0</span> / 500
+                        </div>
+                        <button class="btn btn-primary" onclick="submitReview()">Submit Review</button>
+                    </div>
+
+                    <!-- Reviews List -->
+                    <div id="reviewsList" class="reviews-list">
+                        <p class="loading">Loading reviews...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        let filteredProducts = [];
+
+        // Initialize buyer dashboard
+        async function initBuyerDashboard() {
+            console.log('🔄 Initializing buyer dashboard...');
+            redirectIfNotLoggedIn();
+            loadTheme();
+            
+            // Setup textarea character counter
+            const textarea = document.getElementById('reviewComment');
+            if (textarea) {
+                textarea.addEventListener('input', () => {
+                    document.getElementById('charCount').textContent = textarea.value.length;
+                });
+            }
+            
+            await loadBuyerDashboard();
+            console.log('✅ Buyer dashboard initialized');
+        }
+
+        async function loadBuyerDashboard() {
+            console.log('📊 Loading buyer dashboard data...');
+            await renderProducts();
+            updateCartCount();
+            console.log('✅ Dashboard data loaded');
+        }
+
+        async function renderProducts() {
+            try {
+                // Fetch products from backend API
+                console.log('🛍️ Fetching products from API from:', 'http://localhost:5000/api/products');
+                const products = await getProducts();
+                console.log(`✅ Received ${products?.length || 0} products from API`);
+                if (products && products.length > 0) {
+                    console.log('📋 First product:', products[0]);
+                }
+                filteredProducts = [...((products || []).filter(p => p))];
+                console.log(`📦 Stored ${filteredProducts.length} products in filteredProducts array`);
+
+                const grid = document.getElementById('productsGrid');
+                if (!products || products.length === 0) {
+                    console.warn('⚠️ No products available from API - showing empty message');
+                    grid.innerHTML = '<p class="empty-message">No products available yet. Please try again later.</p>';
+                    return;
+                }
+
+                console.log('🎨 Rendering products to grid...');
+                const productHTML = products.filter(product => product).map(product => {
+                    const stars = Math.round(product.rating || 0);
+                    const starDisplay = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+                    
+                    return `
+                        <div class="product-card">
+                            <div class="product-image">
+                                <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/250x250?text=No+Image'">
+                                <span class="category-badge">${product.category}</span>
+                                <button class="wishlist-btn" onclick="toggleWishlist(${product.id})">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                                <button class="view-details-btn" onclick="viewProductDetails(${product.id}, '${product.name.replace(/'/g, "\\'")}', '${product.image.replace(/'/g, "\\'")}', '${product.description.replace(/'/g, "\\'")}', ${product.price}, '${product.category}', '${product.farmer_name.replace(/'/g, "\\'")}')" title="View Details & Reviews">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="product-info">
+                                <h3>${product.name}</h3>
+                                <p class="farmer-name">👨‍🌾 ${product.farmer_name || 'Unknown Farmer'}</p>
+                                <p class="description">${product.description || 'No description'}</p>
+                                
+                                <div class="product-rating-bar">
+                                    <span class="stars-mini">${starDisplay}</span>
+                                    <span class="rating-value">${product.rating?.toFixed(1) || '0.0'}</span>
+                                </div>
+                                
+                                <div class="product-footer">
+                                    <div class="product-price">₹${product.price.toFixed(2)}</div>
+                                    <button class="btn btn-primary btn-sm" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">
+                                        <i class="fas fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                grid.innerHTML = productHTML;
+                console.log(`✅ Rendered ${products.length} products to grid successfully`);
+            } catch (error) {
+                console.error('Error loading products:', error);
+                const grid = document.getElementById('productsGrid');
+                grid.innerHTML = '<p class="empty-message">Error loading products. Please try again.</p>';
+            }
+        }
+
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const category = document.getElementById('categoryFilter').value;
+            const priceMin = parseFloat(document.getElementById('priceMin').value) || 0;
+            const priceMax = parseFloat(document.getElementById('priceMax').value) || Infinity;
+            const sortBy = document.getElementById('sortBy').value;
+
+            let filtered = filteredProducts.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                    product.description.toLowerCase().includes(searchTerm) ||
+                                    (product.farmer_name && product.farmer_name.toLowerCase().includes(searchTerm));
+                const matchesCategory = !category || product.category === category;
+                const matchesPrice = product.price >= priceMin && product.price <= priceMax;
+                return matchesSearch && matchesCategory && matchesPrice;
+            });
+
+            // Apply sorting
+            if (sortBy === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortBy === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortBy === 'rating') {
+                filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+            } else if (sortBy === 'newest') {
+                filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            }
+
+            const grid = document.getElementById('productsGrid');
+            if (filtered.length === 0) {
+                grid.innerHTML = '<p class="empty-message">No products found matching your criteria</p>';
+                return;
+            }
+
+            const filteredHTML = filtered.map(product => {
+                const stars = Math.round(product.rating || 0);
+                const starDisplay = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+                
+                return `
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="${product.image}" alt="${product.name}" onerror="this.src='https://via.placeholder.com/250x250?text=No+Image'">
+                        <span class="category-badge">${product.category}</span>
+                        <button class="wishlist-btn" onclick="toggleWishlist(${product.id})">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <button class="view-details-btn" onclick="viewProductDetails(${product.id}, '${product.name.replace(/'/g, "\\'")}', '${product.image.replace(/'/g, "\\'")}', '${product.description.replace(/'/g, "\\'")}', ${product.price}, '${product.category}', '${product.farmer_name.replace(/'/g, "\\'")}')" title="View Details & Reviews">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="farmer-name">👨‍🌾 ${product.farmer_name || 'Unknown Farmer'}</p>
+                        <p class="description">${product.description || 'No description'}</p>
+                        
+                        <div class="product-rating-bar">
+                            <span class="stars-mini">${starDisplay}</span>
+                            <span class="rating-value">${product.rating?.toFixed(1) || '0.0'}</span>
+                        </div>
+                        
+                        <div class="product-footer">
+                            <div class="product-price">₹${product.price.toFixed(2)}</div>
+                            <button class="btn btn-primary btn-sm" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+            grid.innerHTML = filteredHTML;
+            console.log(`✅ Filtered products rendered (${filtered.length} items)`);
+        }
+
+        let currentProductId = null;
+        let currentReviewRating = 0;
+
+        async function viewProductDetails(productId, name, image, description, price, category, farmerName) {
+            currentProductId = productId;
+            currentReviewRating = 0;
+            
+            // Update modal with product details
+            document.getElementById('detailProductName').textContent = name;
+            document.getElementById('detailProductNameLarge').textContent = name;
+            document.getElementById('detailProductImage').src = image;
+            document.getElementById('detailProductCategory').textContent = category;
+            document.getElementById('detailProductDescription').textContent = description;
+            document.getElementById('detailProductPrice').innerHTML = `<span class="price-value">₹${price.toFixed(2)}</span>`;
+            document.getElementById('detailProductFarmer').innerHTML = `<i class="fas fa-user-circle"></i> by ${farmerName}`;
+            
+            // Reset review form
+            document.getElementById('reviewComment').value = '';
+            document.getElementById('charCount').textContent = '0';
+            setReviewRating(0);
+            
+            // Load reviews
+            await loadProductReviews(productId);
+            
+            // Open modal
+            openModal('productDetailsModal');
+        }
+
+        async function loadProductReviews(productId) {
+            try {
+                const reviews = await getProductReviews(productId);
+                const reviewsList = document.getElementById('reviewsList');
+                
+                if (!reviews || reviews.length === 0) {
+                    reviewsList.innerHTML = '<p class="no-reviews">No reviews yet. Be the first to review!</p>';
+                    return;
+                }
+
+                const reviewCount = reviews.length;
+                const avgRating = (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviewCount).toFixed(1);
+                
+                document.getElementById('detailProductRating').innerHTML = 
+                    '★'.repeat(Math.round(avgRating)) + '☆'.repeat(5 - Math.round(avgRating));
+                document.getElementById('detailReviewCount').textContent = `(${reviewCount} review${reviewCount !== 1 ? 's' : ''})`;
+
+                reviewsList.innerHTML = reviews.map(review => {
+                    const stars = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+                    return `
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="review-stars">${stars}</span>
+                                <span class="review-rating-text">${review.rating} / 5</span>
+                            </div>
+                            <p class="review-comment">${review.comment || 'No comment provided'}</p>
+                            <div class="review-meta">
+                                <span class="review-date">${new Date(review.created_at).toLocaleDateString()}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading reviews:', error);
+                document.getElementById('reviewsList').innerHTML = '<p class="error">Failed to load reviews</p>';
+            }
+        }
+
+        function setReviewRating(rating) {
+            currentReviewRating = rating;
+            const stars = document.querySelectorAll('.star-rating .star');
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.add('active');
+                } else {
+                    star.classList.remove('active');
+                }
+            });
+            document.getElementById('ratingValue').textContent = rating > 0 ? `${rating} star${rating !== 1 ? 's' : ''}` : '0 stars';
+        }
+
+        async function submitReview() {
+            if (!currentProductId) {
+                showToast('Please select a product first', 'error');
+                return;
+            }
+
+            if (currentReviewRating === 0) {
+                showToast('Please select a rating', 'error');
+                return;
+            }
+
+            const comment = document.getElementById('reviewComment').value.trim();
+
+            try {
+                await createReview(currentProductId, currentReviewRating, comment);
+                showToast('Review submitted successfully!', 'success');
+                
+                // Reset form
+                document.getElementById('reviewComment').value = '';
+                document.getElementById('charCount').textContent = '0';
+                setReviewRating(0);
+                
+                // Reload reviews
+                await loadProductReviews(currentProductId);
+            } catch (error) {
+                console.error('Error submitting review:', error);
+                showToast('Failed to submit review: ' + error.message, 'error');
+            }
+        }
+
+        function addToCartFromDetail() {
+            const name = document.getElementById('detailProductNameLarge').textContent;
+            const priceText = document.getElementById('detailProductPrice').textContent;
+            const price = parseFloat(priceText.replace('$', '').replace(/[^\d.-]/g, ''));
+            
+            addToCart(currentProductId, name, price);
+            closeModal('productDetailsModal');
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            filterProducts();
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('priceMin').value = '';
+            document.getElementById('priceMax').value = '';
+            document.getElementById('sortBy').value = '';
+            renderProducts();
+        }
+
+        function addToCart(productId, productName, price) {
+            let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            
+            const existingItem = cart.find(item => item.productId === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ productId, productName, price, quantity: 1 });
+            }
+
+            sessionStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast(`${productName} added to cart!`, 'success');
+        }
+
+        function updateCartCount() {
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            const count = cart.reduce((total, item) => total + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cartModal');
+            if (modal.style.display === 'flex') {
+                modal.style.display = 'none';
+            } else {
+                modal.style.display = 'flex';
+                renderCart();
+            }
+        }
+
+        function renderCart() {
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            const cartItemsContainer = document.getElementById('cartItems');
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="empty-message">Your cart is empty</p>';
+                document.getElementById('subtotal').textContent = '₹0.00';
+                document.getElementById('total').textContent = '₹0.00';
+                return;
+            }
+
+            let subtotal = 0;
+            cartItemsContainer.innerHTML = cart.map(item => {
+                const itemTotal = item.price * item.quantity;
+                subtotal += itemTotal;
+                return `
+                    <div class="cart-item">
+                        <div class="cart-item-details">
+                            <h4>${item.productName}</h4>
+                            <p>₹${item.price.toFixed(2)} each</p>
+                        </div>
+                        <div class="cart-item-quantity">
+                            <button onclick="decrementQuantity('${item.productId}')">-</button>
+                            <input type="number" value="${item.quantity}" readonly>
+                            <button onclick="incrementQuantity('${item.productId}')">+</button>
+                        </div>
+                        <div class="cart-item-total">₹${itemTotal.toFixed(2)}</div>
+                        <button class="btn-remove" onclick="removeFromCart('${item.productId}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
+            document.getElementById('total').textContent = '₹' + subtotal.toFixed(2);
+        }
+
+        function incrementQuantity(productId) {
+            let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            const item = cart.find(i => i.productId === productId);
+            if (item) {
+                item.quantity += 1;
+                sessionStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                renderCart();
+            }
+        }
+
+        function decrementQuantity(productId) {
+            let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            const item = cart.find(i => i.productId === productId);
+            if (item) {
+                if (item.quantity > 1) {
+                    item.quantity -= 1;
+                } else {
+                    cart = cart.filter(i => i.productId !== productId);
+                }
+                sessionStorage.setItem('cart', JSON.stringify(cart));
+                updateCartCount();
+                renderCart();
+            }
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            cart = cart.filter(i => i.productId !== productId);
+            sessionStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            renderCart();
+        }
+
+        async function placeOrder() {
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                showToast('Cart is empty', 'error');
+                return;
+            }
+
+            try {
+                // Get all products to map IDs
+                const allProducts = await getProducts();
+                
+                // Transform cart items to match API format
+                const orderItems = cart.map(item => ({
+                    product_id: item.productId,
+                    quantity: item.quantity
+                }));
+
+                const orderData = {
+                    products: orderItems,
+                    paymentMethod: 'credit_card'  // Default method, can be changed
+                };
+
+                const response = await createOrder(orderData);
+
+                if (response) {
+                    sessionStorage.setItem('cart', JSON.stringify([]));
+                    updateCartCount();
+                    toggleCart();
+                    showToast('Order placed successfully! Order #' + response.id, 'success');
+                    await renderBuyerOrders();
+                }
+            } catch (error) {
+                console.error('Order placement error:', error);
+                showToast('Failed to place order: ' + (error?.message || 'Unknown error'), 'error');
+            }
+        }
+
+        function proceedToPayment() {
+            const cart = JSON.parse(sessionStorage.getItem('cart')) || [];
+            if (cart.length === 0) {
+                showToast('Cart is empty', 'error');
+                return;
+            }
+            window.location.href = 'payment.html';
+        }
+
+        async function toggleWishlist(productId) {
+            try {
+                await addToWishlist(productId);
+                showToast('Added to wishlist', 'success');
+            } catch (error) {
+                showToast('Failed to update wishlist', 'error');
+            }
+        }
+
+        async function renderBuyerOrders() {
+            try {
+                console.log('📦 Loading buyer orders...');
+                const orders = await getOrders();
+                console.log('📦 Orders received:', orders);
+                
+                const list = document.getElementById('ordersList');
+                
+                if (!orders || orders.length === 0) {
+                    list.innerHTML = '<p class="empty-message">No orders yet</p>';
+                    return;
+                }
+
+                list.innerHTML = orders.map(order => {
+                    const itemsCount = order.items?.length || 0;
+                    const statusClass = `status-${(order.status || 'pending').toLowerCase()}`;
+                    
+                    return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-title">
+                                <h3>Order #${order.id}</h3>
+                                <span class="order-date">${new Date(order.created_at).toLocaleDateString()}</span>
+                            </div>
+                            <span class="status-badge ${statusClass}">${order.status || 'Pending'}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Total Amount:</strong> ₹${(order.total || 0).toFixed(2)}</p>
+                            <p><strong>Items:</strong> ${itemsCount} product(s)</p>
+                            <p><strong>Payment Method:</strong> ${order.payment_method || 'N/A'}</p>
+                        </div>
+                        ${order.items && order.items.length > 0 ? `
+                        <div class="order-items">
+                            <strong>Products Ordered:</strong>
+                            <ul>
+                                ${order.items.map(item => `
+                                    <li>${item.product_name || 'Product'} - Qty: ${item.quantity} @ ₹${(item.price || 0).toFixed(2)}</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                        ` : ''}
+                        <div class="order-status-info">
+                            <small>Order Status: <strong>${order.status || 'Pending'}</strong></small>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showToast('Failed to load orders', 'error');
+            }
+        }
+
+        function showSection(section) {
+            console.log(`🔀 Switching to section: ${section}`);
+            
+            // Hide all sections
+            document.querySelectorAll('.dashboard-section').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Remove active state from all menu items
+            document.querySelectorAll('.menu-item').forEach(el => {
+                el.classList.remove('active');
+            });
+
+            // Show selected section
+            if (section === 'browse') {
+                console.log('📂 Showing browse section');
+                const browseSection = document.getElementById('browse-section');
+                if (browseSection) browseSection.style.display = 'block';
+                
+                // Add active class to Browse Products link
+                const menuItems = document.querySelectorAll('.menu-item');
+                if (menuItems[0]) menuItems[0].classList.add('active');
+                console.log('✅ Browse section shown');
+            } else if (section === 'orders') {
+                console.log('📂 Showing orders section');
+                const ordersSection = document.getElementById('orders-section');
+                if (ordersSection) ordersSection.style.display = 'block';
+                
+                // Add active class to My Orders link
+                const menuItems = document.querySelectorAll('.menu-item');
+                if (menuItems[1]) menuItems[1].classList.add('active');
+                console.log('✅ Orders section shown, loading orders data...');
+                
+                renderBuyerOrders();
+            }
+
+            closeSidebarMobile();
+        }
+
+        function closeSidebarMobile() {
+            if (window.innerWidth < 1024) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', initBuyerDashboard);
+    </script>
+</body>
+</html>
