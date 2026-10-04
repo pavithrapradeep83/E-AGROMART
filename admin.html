@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Farmer Market</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* ── Approval badge colours ── */
+        .badge-pending  { background:#fff3cd; color:#856404; border:1px solid #ffc107; border-radius:6px; padding:2px 10px; font-size:.8rem; font-weight:600; }
+        .badge-approved { background:#d1e7dd; color:#0a5c36; border:1px solid #198754; border-radius:6px; padding:2px 10px; font-size:.8rem; font-weight:600; }
+        .badge-rejected { background:#f8d7da; color:#842029; border:1px solid #dc3545; border-radius:6px; padding:2px 10px; font-size:.8rem; font-weight:600; }
+
+        /* ── Product tab filter bar ── */
+        .tab-bar { display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+        .tab-btn  { padding:8px 20px; border-radius:20px; border:2px solid #e0e0e0; background:#fff; cursor:pointer; font-weight:600; font-size:.9rem; transition:all .2s; }
+        .tab-btn.active        { background:var(--primary,#2e7d32); color:#fff; border-color:var(--primary,#2e7d32); }
+        .tab-btn .badge-count  { display:inline-block; background:rgba(255,255,255,.3); border-radius:10px; padding:1px 7px; margin-left:5px; font-size:.78rem; }
+        .tab-btn:not(.active) .badge-count { background:#eee; color:#555; }
+
+        /* ── Approval action buttons ── */
+        .btn-approve { background:#198754; color:#fff; border:none; }
+        .btn-approve:hover { background:#157347; }
+        .btn-reject  { background:#dc3545; color:#fff; border:none; }
+        .btn-reject:hover  { background:#bb2d3b; }
+
+        /* ── Pending indicator on sidebar ── */
+        .pending-dot { display:inline-block; width:8px; height:8px; background:#ffc107; border-radius:50%; margin-left:6px; vertical-align:middle; }
+
+        /* ── Stat card accent for pending ── */
+        .stat-card.accent-warning .stat-icon { background:#fff3cd; color:#856404; }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-logo">
+                <i class="fas fa-leaf"></i> Farmer Market
+            </div>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="javascript:void(0)" onclick="logout()" class="nav-link">Logout</a></li>
+            </ul>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h3>Admin Menu</h3>
+                <button class="close-sidebar" id="closeSidebar">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <nav class="sidebar-menu">
+                <a href="javascript:void(0)" class="menu-item active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="showSection('users')">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="showSection('products')">
+                    <i class="fas fa-box"></i> Products
+                    <span class="pending-dot" id="sidebarPendingDot" style="display:none;"></span>
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="showSection('orders')">
+                    <i class="fas fa-receipt"></i> Orders
+                </a>
+                <a href="javascript:void(0)" class="menu-item" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- ══════════════ DASHBOARD SECTION ══════════════ -->
+            <section id="dashboard-section" class="dashboard-section">
+                <div class="section-header">
+                    <h1>Admin Dashboard</h1>
+                    <p>Overview of your platform</p>
+                </div>
+
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                        <div class="stat-content"><h3 id="totalUsers">0</h3><p>Total Users</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-box"></i></div>
+                        <div class="stat-content"><h3 id="totalProducts">0</h3><p>Total Products</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-receipt"></i></div>
+                        <div class="stat-content"><h3 id="totalOrders">0</h3><p>Total Orders</p></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fas fa-currency-dollar"></i></div>
+                        <div class="stat-content"><h3 id="totalRevenue">₹0</h3><p>Total Revenue</p></div>
+                    </div>
+                    <!-- NEW: Pending approvals card -->
+                    <div class="stat-card accent-warning" style="cursor:pointer;" onclick="showSection('products'); setProductTab('pending')">
+                        <div class="stat-icon"><i class="fas fa-hourglass-half"></i></div>
+                        <div class="stat-content"><h3 id="pendingApprovalCount">0</h3><p>Pending Approvals</p></div>
+                    </div>
+                </div>
+
+                <div class="analytics-section">
+                    <h2>Platform Analytics</h2>
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>Active Farmers</h3>
+                            <div class="big-number" id="activeFarmers">0</div>
+                            <p class="analytics-label">Verified Sellers</p>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Active Buyers</h3>
+                            <div class="big-number" id="activeBuyers">0</div>
+                            <p class="analytics-label">Registered Buyers</p>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Top Seller</h3>
+                            <div class="big-text" id="topSeller">N/A</div>
+                            <p class="analytics-label">Most Products</p>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Top Buyer</h3>
+                            <div class="big-text" id="topBuyer">N/A</div>
+                            <p class="analytics-label">Most Orders</p>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Pending Orders</h3>
+                            <div class="big-number" id="pendingOrdersAdmin">0</div>
+                            <p class="analytics-label">Awaiting Approval</p>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>Monthly Growth</h3>
+                            <div class="big-number" id="monthlyGrowth">0%</div>
+                            <p class="analytics-label">Order Increase</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════ USERS SECTION ══════════════ -->
+            <section id="users-section" class="dashboard-section" style="display:none;">
+                <div class="section-header"><h1>User Management</h1></div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="userSearch" placeholder="Search users..." onkeyup="filterUsers()">
+                </div>
+                <div id="usersList" class="users-table-container"></div>
+            </section>
+
+            <!-- ══════════════ PRODUCTS SECTION ══════════════ -->
+            <section id="products-section" class="dashboard-section" style="display:none;">
+                <div class="section-header"><h1>Product Moderation</h1></div>
+
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="productSearch" placeholder="Search products..." onkeyup="filterProductsAdmin()">
+                </div>
+
+                <!-- Tab filter bar -->
+                <div class="tab-bar">
+                    <button class="tab-btn active" id="tab-all"      onclick="setProductTab('all')">
+                        All <span class="badge-count" id="count-all">0</span>
+                    </button>
+                    <button class="tab-btn"         id="tab-pending"  onclick="setProductTab('pending')">
+                        ⏳ Pending <span class="badge-count" id="count-pending">0</span>
+                    </button>
+                    <button class="tab-btn"         id="tab-approved" onclick="setProductTab('approved')">
+                        ✅ Approved <span class="badge-count" id="count-approved">0</span>
+                    </button>
+                    <button class="tab-btn"         id="tab-rejected" onclick="setProductTab('rejected')">
+                        ❌ Rejected <span class="badge-count" id="count-rejected">0</span>
+                    </button>
+                </div>
+
+                <div id="productsListAdmin" class="products-grid"></div>
+            </section>
+
+            <!-- ══════════════ ORDERS SECTION ══════════════ -->
+            <section id="orders-section" class="dashboard-section" style="display:none;">
+                <div class="section-header"><h1>Order Management</h1></div>
+                <div id="ordersList" class="orders-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>User Details</h2>
+                <button class="modal-close" onclick="closeModal('userModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="userDetails" class="user-details"></div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script src="frontend-config.js?v=20260317-001"></script>
+    <script src="js/script.js"></script>
+    <script>
+        let filteredUsers = [];
+        let filteredProductsAdmin = [];
+        let allAdminProducts = [];
+        let currentProductTab = 'all';
+
+        // ─── Theme ───────────────────────────────────────────
+        function loadTheme() {
+            const theme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            loadTheme();
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) {
+                toggle.addEventListener('click', function () {
+                    const cur = document.documentElement.getAttribute('data-theme');
+                    const next = cur === 'light' ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('theme', next);
+                });
+            }
+        });
+
+        // ─── Init ─────────────────────────────────────────────
+        async function initAdminDashboard() {
+            redirectIfNotLoggedIn();
+            await loadAdminDashboard();
+        }
+
+        async function loadAdminDashboard() {
+            await updateAdminStats();
+            await renderAdminUsers();
+            await renderAdminProducts();
+            await renderAdminOrders();
+        }
+
+        // ─── Stats ────────────────────────────────────────────
+        async function updateAdminStats() {
+            try {
+                const users    = await getAdminUsers();
+                const products = await getAdminProducts();
+                const orders   = await getAdminOrders();
+
+                const totalRevenue = orders
+                    .filter(o => o.status === 'Delivered' || o.status === 'delivered')
+                    .reduce((sum, o) => sum + (o.total || 0), 0);
+
+                const activeFarmers = users.filter(u => u.role === 'farmer').length;
+                const activeBuyers  = users.filter(u => u.role === 'buyer').length;
+
+                // Top seller
+                const farmerProducts = {};
+                products.forEach(p => { if (p.farmer_id) farmerProducts[p.farmer_id] = (farmerProducts[p.farmer_id] || 0) + 1; });
+                const topSellerId  = Object.keys(farmerProducts).reduce((a, b) => farmerProducts[a] > farmerProducts[b] ? a : b, null);
+                const topSellerName = topSellerId ? (users.find(u => u.id == topSellerId)?.name || 'N/A') : 'N/A';
+
+                // Top buyer
+                const buyerOrders = {};
+                orders.forEach(o => { buyerOrders[o.buyer_id] = (buyerOrders[o.buyer_id] || 0) + 1; });
+                const topBuyerId   = Object.keys(buyerOrders).reduce((a, b) => buyerOrders[a] > buyerOrders[b] ? a : b, null);
+                const topBuyerName = topBuyerId ? (users.find(u => u.id == topBuyerId)?.name || 'N/A') : 'N/A';
+
+                const pendingOrders = orders.filter(o => o.status === 'Pending' || o.status === 'pending').length;
+
+                // Monthly growth
+                const now = new Date();
+                const cm = now.getMonth(), cy = now.getFullYear();
+                const lm = cm === 0 ? 11 : cm - 1, ly = cm === 0 ? cy - 1 : cy;
+                const thisM = orders.filter(o => { const d = new Date(o.created_at); return d.getMonth()===cm && d.getFullYear()===cy; }).length;
+                const lastM = orders.filter(o => { const d = new Date(o.created_at); return d.getMonth()===lm && d.getFullYear()===ly; }).length;
+                const growth = lastM === 0 ? 100 : Math.round(((thisM - lastM) / lastM) * 100);
+
+                // Pending product approvals
+                const pendingProducts = products.filter(p => !p.status || p.status === 'pending').length;
+
+                // Update UI
+                document.getElementById('totalUsers').textContent    = users.length;
+                document.getElementById('totalProducts').textContent = products.length;
+                document.getElementById('totalOrders').textContent   = orders.length;
+                document.getElementById('totalRevenue').textContent  = '₹' + totalRevenue.toFixed(2);
+                document.getElementById('activeFarmers').textContent = activeFarmers;
+                document.getElementById('activeBuyers').textContent  = activeBuyers;
+                document.getElementById('topSeller').textContent     = topSellerName;
+                document.getElementById('topBuyer').textContent      = topBuyerName;
+                document.getElementById('pendingOrdersAdmin').textContent = pendingOrders;
+                document.getElementById('monthlyGrowth').textContent = (growth > 0 ? '+' : '') + growth + '%';
+                document.getElementById('pendingApprovalCount').textContent = pendingProducts;
+
+                // Show/hide sidebar dot
+                const dot = document.getElementById('sidebarPendingDot');
+                if (dot) dot.style.display = pendingProducts > 0 ? 'inline-block' : 'none';
+
+            } catch (error) {
+                console.error('Error updating stats:', error);
+                showToast('Error loading stats', 'error');
+            }
+        }
+
+        // ─── Users ────────────────────────────────────────────
+        function buildUsersTable(users) {
+            if (users.length === 0) return '<p class="empty-message">No users found</p>';
+            let html = '<table class="users-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead><tbody>';
+            html += users.map(user => `
+                <tr>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="role-badge role-${user.role}">${user.role}</span></td>
+                    <td>${new Date(user.created_at).toLocaleDateString()}</td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewUserDetails('${user.id}')">View</button>
+                        <button class="btn btn-sm btn-danger"  onclick="deleteUser('${user.id}')">Delete</button>
+                    </td>
+                </tr>`).join('');
+            return html + '</tbody></table>';
+        }
+
+        async function renderAdminUsers() {
+            try {
+                const users = await getAdminUsers();
+                filteredUsers = [...users];
+                document.getElementById('usersList').innerHTML = buildUsersTable(users);
+            } catch (e) {
+                console.error(e);
+                showToast('Error loading users', 'error');
+            }
+        }
+
+        async function filterUsers() {
+            const term = document.getElementById('userSearch').value.toLowerCase();
+            const users = await getAdminUsers();
+            filteredUsers = users.filter(u => u.name.toLowerCase().includes(term) || u.email.toLowerCase().includes(term));
+            document.getElementById('usersList').innerHTML = buildUsersTable(filteredUsers);
+        }
+
+        async function viewUserDetails(userId) {
+            try {
+                const users = await getAdminUsers();
+                const user  = users.find(u => u.id === userId);
+                if (!user) { showToast('User not found', 'error'); return; }
+                document.getElementById('userDetails').innerHTML = `
+                    <div class="detail-row"><strong>Name:</strong><span>${user.name}</span></div>
+                    <div class="detail-row"><strong>Email:</strong><span>${user.email}</span></div>
+                    <div class="detail-row"><strong>Role:</strong><span>${user.role}</span></div>
+                    <div class="detail-row"><strong>Joined:</strong><span>${new Date(user.created_at).toLocaleDateString()}</span></div>
+                    <div style="margin-top:20px;">
+                        <button class="btn btn-secondary" onclick="closeModal('userModal')">Close</button>
+                    </div>`;
+                openModal('userModal');
+            } catch (e) {
+                console.error(e);
+                showToast('Error loading user details', 'error');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('Are you sure you want to delete this user?')) return;
+            try {
+                await deleteAdminUser(userId);
+                showToast('User deleted successfully', 'success');
+                await renderAdminUsers();
+                await updateAdminStats();
+            } catch (e) {
+                console.error(e);
+                showToast('Error deleting user', 'error');
+            }
+        }
+
+        // ─── Products ─────────────────────────────────────────
+
+        /** Build a single product card with correct action buttons based on status */
+        function buildProductCard(product) {
+            const status  = product.status || 'pending';
+            const badgeCls = status === 'approved' ? 'badge-approved'
+                           : status === 'rejected'  ? 'badge-rejected'
+                           : 'badge-pending';
+            const badgeTxt = status === 'approved' ? 'Approved'
+                           : status === 'rejected'  ? 'Rejected'
+                           : 'Pending';
+
+            const approvalBtns = status === 'pending' ? `
+                <button class="btn btn-sm btn-approve" onclick="approveProduct('${product.id}')">
+                    <i class="fas fa-check"></i> Approve
+                </button>
+                <button class="btn btn-sm btn-reject" onclick="rejectProduct('${product.id}')">
+                    <i class="fas fa-times"></i> Reject
+                </button>` : status === 'rejected' ? `
+                <button class="btn btn-sm btn-approve" onclick="approveProduct('${product.id}')">
+                    <i class="fas fa-check"></i> Approve
+                </button>` : `
+                <button class="btn btn-sm btn-reject" onclick="rejectProduct('${product.id}')">
+                    <i class="fas fa-ban"></i> Revoke
+                </button>`;
+
+            return `
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="${product.image}" alt="${product.name}"
+                         onerror="this.src='https://via.placeholder.com/250x250?text=No+Image'">
+                </div>
+                <div class="product-info">
+                    <h3>${product.name}</h3>
+                    <p class="category">${product.category}</p>
+                    <p class="description">${product.description || 'No description'}</p>
+                    <div class="product-price">₹${product.price.toFixed(2)}</div>
+                    <p class="farmer-info">Farmer: ${product.farmer_id}</p>
+                    <p style="margin:6px 0;"><span class="${badgeCls}">${badgeTxt}</span></p>
+                    <div class="product-actions" style="flex-wrap:wrap; gap:6px;">
+                        ${approvalBtns}
+                        <button class="btn btn-sm btn-danger" onclick="deleteProductAdmin('${product.id}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        function updateTabCounts(products) {
+            const all      = products.length;
+            const pending  = products.filter(p => !p.status || p.status === 'pending').length;
+            const approved = products.filter(p => p.status === 'approved').length;
+            const rejected = products.filter(p => p.status === 'rejected').length;
+
+            document.getElementById('count-all').textContent      = all;
+            document.getElementById('count-pending').textContent  = pending;
+            document.getElementById('count-approved').textContent = approved;
+            document.getElementById('count-rejected').textContent = rejected;
+
+            // Show sidebar dot if pending > 0
+            const dot = document.getElementById('sidebarPendingDot');
+            if (dot) dot.style.display = pending > 0 ? 'inline-block' : 'none';
+        }
+
+        function setProductTab(tab) {
+            currentProductTab = tab;
+            ['all','pending','approved','rejected'].forEach(t => {
+                document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+            });
+            renderProductGrid(allAdminProducts);
+        }
+
+        function renderProductGrid(products) {
+            const search = (document.getElementById('productSearch')?.value || '').toLowerCase();
+
+            let filtered = products.filter(p =>
+                p.name.toLowerCase().includes(search) ||
+                p.category.toLowerCase().includes(search)
+            );
+
+            if (currentProductTab === 'pending')
+                filtered = filtered.filter(p => !p.status || p.status === 'pending');
+            else if (currentProductTab === 'approved')
+                filtered = filtered.filter(p => p.status === 'approved');
+            else if (currentProductTab === 'rejected')
+                filtered = filtered.filter(p => p.status === 'rejected');
+
+            const grid = document.getElementById('productsListAdmin');
+            if (filtered.length === 0) {
+                grid.innerHTML = `<p class="empty-message">No ${currentProductTab === 'all' ? '' : currentProductTab + ' '}products found</p>`;
+                return;
+            }
+            grid.innerHTML = filtered.map(buildProductCard).join('');
+        }
+
+        async function renderAdminProducts() {
+            try {
+                allAdminProducts = await getAdminProducts();
+                updateTabCounts(allAdminProducts);
+                renderProductGrid(allAdminProducts);
+            } catch (e) {
+                console.error(e);
+                showToast('Error loading products', 'error');
+            }
+        }
+
+        function filterProductsAdmin() {
+            renderProductGrid(allAdminProducts);
+        }
+
+        // ─── Approve / Reject ─────────────────────────────────
+        async function approveProduct(productId) {
+            try {
+                // Call your backend API to update product status
+                await updateProductStatus(productId, 'approved');
+                showToast('Product approved! It is now visible to buyers.', 'success');
+                await renderAdminProducts();
+                await updateAdminStats();
+            } catch (e) {
+                console.error(e);
+                showToast('Failed to approve product', 'error');
+            }
+        }
+
+        async function rejectProduct(productId) {
+            const reason = prompt('Optional: Enter a reason for rejection (shown to farmer)') || '';
+            try {
+                await updateProductStatus(productId, 'rejected', reason);
+                showToast('Product rejected.', 'success');
+                await renderAdminProducts();
+                await updateAdminStats();
+            } catch (e) {
+                console.error(e);
+                showToast('Failed to reject product', 'error');
+            }
+        }
+
+        async function deleteProductAdmin(productId) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            try {
+                await deleteAdminProduct(productId);
+                showToast('Product deleted successfully', 'success');
+                await renderAdminProducts();
+                await updateAdminStats();
+            } catch (e) {
+                console.error(e);
+                showToast('Error deleting product', 'error');
+            }
+        }
+
+        // ─── Orders ───────────────────────────────────────────
+        async function renderAdminOrders() {
+            try {
+                const orders = await getAdminOrders();
+                const list   = document.getElementById('ordersList');
+
+                if (orders.length === 0) {
+                    list.innerHTML = '<p class="empty-message">No orders found</p>';
+                    return;
+                }
+
+                list.innerHTML = orders.map(order => `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <h3>Order #${String(order.id).substring(0, 8)}</h3>
+                            <span class="status-badge status-${(order.status||'pending').toLowerCase()}">${order.status}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Buyer ID:</strong> ${order.buyer_id}</p>
+                            <p><strong>Total:</strong> ₹${(order.total||0).toFixed(2)}</p>
+                            <p><strong>Payment Method:</strong> ${order.payment_method || 'Not specified'}</p>
+                            <p><strong>Date:</strong> ${new Date(order.created_at).toLocaleDateString()}</p>
+                        </div>
+                    </div>`).join('');
+            } catch (e) {
+                console.error(e);
+                showToast('Error loading orders', 'error');
+            }
+        }
+
+        // ─── Section navigation ───────────────────────────────
+        async function showSection(section) {
+            document.querySelectorAll('.dashboard-section').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+
+            const map = { dashboard:'dashboard', users:'users', products:'products', orders:'orders' };
+            const id  = map[section];
+            if (id) {
+                document.getElementById(id + '-section').style.display = 'block';
+                document.querySelector(`[onclick="showSection('${section}')"]`).classList.add('active');
+            }
+
+            if (section === 'dashboard') await updateAdminStats();
+            if (section === 'users')     await renderAdminUsers();
+            if (section === 'products')  await renderAdminProducts();
+            if (section === 'orders')    await renderAdminOrders();
+
+            closeSidebarMobile();
+        }
+
+        // ─── Helpers ──────────────────────────────────────────
+        function openModal(id)  { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        function closeSidebarMobile() {
+            if (window.innerWidth < 1024) document.getElementById('sidebar').classList.remove('active');
+        }
+
+        document.addEventListener('DOMContentLoaded', initAdminDashboard);
+    </script>
+</body>
+</html>
